@@ -1,0 +1,51 @@
+import time
+import praw
+
+
+username="learn_python_test" #The python bot username
+password="12345678" #The bots password
+subreddit = "bottesting" #Insert the subreddit you want this bot to be active in
+
+#search_term is the key word the bot looks for
+search_term="happy"
+
+#Here we will define the number of posts that the bot will look through
+num_post=10
+
+#After a certain number of scans the bot will sleep
+#The following is the amount of time the bot will sleep
+sleep_time=1
+
+already_seen=set()
+
+
+r=praw.Reddit("Patricks_python_test_bot by /u/patsoldier") #praw.Reddit is a function of the Reddit class
+r.login(username,password) #login to the bot
+subreddit=r.get_subreddit(subreddit) #Gives you the information from the subreddit
+text_file_name="python_bot_file"
+import sys
+
+def write():
+
+    name = text_file_name+'.txt'  # Name of text file coerced with +.txt
+
+    file = open(name,'a')   # Trying to create a new file or open one
+    file.close()
+    
+write()
+
+while True:
+	for submission in subreddit.get_hot():
+		comments = praw.helpers.flatten_tree(submission.comments)
+		for comment in comments:
+			if search_term in comment.body and comment.id not in already_seen:
+				already_seen.add(comment.id)
+				comment.reply("[Don't Worry, Be Happy](https://www.youtube.com/watch?v=Oo4OnQpwjkc)")
+				bot_comment_data = "-----> SubmissionID: %s, \t CommentID: %s, \t Author: %s, \t Score: %s" %\
+				(submission.id, comment.id, comment.author, comment.score)
+				print bot_comment_data
+				file = open(text_file_name+".txt", "w")
+				file.write(bot_comment_data)
+				file.close()
+	print "Done. Next scan in %d minutes." %sleep_time
+	time.sleep(60*sleep_time)
